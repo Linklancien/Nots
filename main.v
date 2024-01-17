@@ -117,6 +117,7 @@ fn main() {
 	app.place_in(2,  11)!
 	app.place_in(1, 12)!
 	*/
+	app.my_junction()or{}
 
 	not_text := ggui.Text{0, 0, 0, "!", gx.TextCfg{color:theme.base, size:20, align:.center, vertical_align:.middle}}
 	wire_text := ggui.Text{0, 0, 0, "-", gx.TextCfg{color:theme.base, size:20, align:.center, vertical_align:.middle}}
