@@ -302,8 +302,6 @@ fn on_event(e &gg.Event, mut app App) {
 						app.mouse_down_y = app.mouse_y - (app.viewport_y + app.screen_y/2) / ceil(tile_size * app.scale)
 						app.mouse_down_preview_x	= app.mouse_x
 						app.mouse_down_preview_y 	= app.mouse_y
-						app.mouse_down_viewport_x	= app.viewport_x
-						app.mouse_down_viewport_y 	= app.viewport_y
 					}
 				}
 			}
