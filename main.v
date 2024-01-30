@@ -295,25 +295,17 @@ fn on_event(e &gg.Event, mut app App) {
 				.middle {
 					app.middle_click_held = true
 				}
-				.left {
+				else{
 					if !(e.mouse_x < 160 && e.mouse_y < 30) {
 						app.is_placing = true
 						app.mouse_down_x = app.mouse_x - (app.viewport_x + app.screen_x/2) / ceil(tile_size * app.scale) 
 						app.mouse_down_y = app.mouse_y - (app.viewport_y + app.screen_y/2) / ceil(tile_size * app.scale)
 						app.mouse_down_preview_x	= app.mouse_x
 						app.mouse_down_preview_y 	= app.mouse_y
+						app.mouse_down_viewport_x	= app.viewport_x
+						app.mouse_down_viewport_y 	= app.viewport_y
 					}
 				}
-				.right {
-					if !(e.mouse_x < 160 && e.mouse_y < 30) {
-						app.is_placing = true
-						app.mouse_down_x = app.mouse_x - (app.viewport_x + app.screen_x/2) / ceil(tile_size * app.scale) 
-						app.mouse_down_y = app.mouse_y - (app.viewport_y + app.screen_y/2) / ceil(tile_size * app.scale)
-						app.mouse_down_preview_x	= app.mouse_x
-						app.mouse_down_preview_y 	= app.mouse_y
-					}
-				}
-				else{}
 			}
 		}
 		.mouse_scroll {
