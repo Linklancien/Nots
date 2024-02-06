@@ -1,15 +1,21 @@
-Test more junctions -> runeed the auto placer
+gates (saveable but via another system)
 
 save system
 
 
-very bad perf when lot of the screen covered by drawing -> replace only what needs to be replaced ?
-
-gates
-
 buttons (keyboard + click)
 levers because nice
 
+1, 2, 3, 4 to select the item to place
+ctrl + Z
+cut/copy/paste
+speed control buttons
+
+
+
+very bad perf when lot of the screen covered by drawing -> replace only what needs to be replaced ?
+fix all the drawing issues + gnome issues
+replace select item menu icons with b&w & semitransparent icons (graphics era)
 
 // Rules to remember:
 Not state updated before queuing them

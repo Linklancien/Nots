@@ -3,13 +3,17 @@ module main
 import gg
 import gx
 import ggui
+import os
 
 
 const tile_size = 128
 const theme = ggui.CatppuchinMocha{}
 const buttons_shape = ggui.RoundedShape{20, 20, 5, .top_left}
-const not_image = load_image('off_not_gate.png')
-const on_not_image = load_image('on_not_gate.png')
+const space = 100
+const bt_scale = 70
+const bt_offset  = 20
+const elem_button_shape = ggui.RoundedShape{bt_scale, bt_scale, 10, .top_left}
+
 
 enum Id {
 	@none
@@ -20,8 +24,8 @@ fn id(id Id) int {
 }
 
 enum Variant as u8 {
-	@none
 	not
+	diode
 	wire
 	junction
 }
@@ -86,6 +90,11 @@ mut:
 	middle_click_held bool
 
 	scale f64 = 0.5
+
+	ui_not 			gg.Image
+	ui_diode		gg.Image
+	ui_junction		gg.Image
+	ui_wire 		gg.Image
 }
 
 fn main() {
@@ -102,59 +111,42 @@ fn main() {
 		init_fn: graphics_init
 		sample_count: 4
 	)
-	app.build_selected_type = .wire
 	app.build_orientation = .west
+
+	app.ui_not = app.gg.create_image(os.resource_abs_path('on_not_gate.png'))!
+	app.ui_diode = app.gg.create_image(os.resource_abs_path('off_diode.png'))!
+	app.ui_junction = app.gg.create_image(os.resource_abs_path('off_junction.png'))!
+	app.ui_wire = app.gg.create_image(os.resource_abs_path('wire_off.png'))!
 
 	// calculate the rotations of the image
 
 	// do your test/base placings here if needed
 
+	empty_text := ggui.Text{0, 0, 0, '', gx.TextCfg{
+		color: theme.base
+		size: 20
+		align: .center
+		vertical_align: .middle
+	}}
 
-	not_text := ggui.Text{0, 0, 0, '!', gx.TextCfg{
-		color: theme.base
-		size: 20
-		align: .center
-		vertical_align: .middle
-	}}
-	wire_text := ggui.Text{0, 0, 0, '-', gx.TextCfg{
-		color: theme.base
-		size: 20
-		align: .center
-		vertical_align: .middle
-	}}
-	minus_text := ggui.Text{0, 0, 0, '-', gx.TextCfg{
-		color: theme.base
-		size: 20
-		align: .center
-		vertical_align: .middle
-	}}
-	plus_text := ggui.Text{0, 0, 0, '+', gx.TextCfg{
-		color: theme.base
-		size: 20
-		align: .center
-		vertical_align: .middle
-	}}
-	_ := gx.TextCfg{
-		color: theme.text
-		size: 20
-		align: .right
-		vertical_align: .top
-	}
+	
+	app.clickables << ggui.Button{0, bt_offset, bt_offset, elem_button_shape, empty_text, gg.Color{200, 200, 200, 100}, not_select}
+	app.clickables << ggui.Button{0, bt_offset, bt_offset + space * 1, elem_button_shape, empty_text, gg.Color{200, 200, 200, 100}, diode_select}
+	app.clickables << ggui.Button{0, bt_offset, bt_offset + space * 2, elem_button_shape, empty_text, gg.Color{200, 200, 200, 100}, wire_select}
+	app.clickables << ggui.Button{0, bt_offset, bt_offset + space * 3, elem_button_shape, empty_text, gg.Color{200, 200, 200, 100}, junction_select}
 
-	app.clickables << ggui.Button{0, 20, 5, buttons_shape, wire_text, theme.red, wire_select}
-	app.clickables << ggui.Button{0, 45, 5, buttons_shape, not_text, theme.green, not_select}
-
-	app.clickables << ggui.Button{0, 60, 5, buttons_shape, minus_text, theme.red, slower_updates}
-	app.clickables << ggui.Button{0, 85, 5, buttons_shape, plus_text, theme.green, faster_updates}
+/*
+TO NOT FORGET 
+	app.clickables << ggui.Button{0, 00, 450, buttons_shape, minus_text, theme.red, slower_updates}
+	app.clickables << ggui.Button{0, 25, 450, buttons_shape, plus_text, theme.green, faster_updates}
+*/
 
 	app.gui_elements << ggui.Rect{
-		x: 0
+		x: 5
 		y: 0
-		shape: ggui.RoundedShape{160, 30, 5, .top_left}
-		color: theme.mantle
+		shape: ggui.RoundedShape{100, 410, 10, .top_left}
+		color: gg.Color{100, 100, 100, 100}
 	}
-
-	app.build_selected_type = .wire
 
 	// lancement du programme/de la fenêtre
 	app.gg.run()
@@ -169,6 +161,18 @@ fn wire_select(mut app ggui.Gui) {
 fn not_select(mut app ggui.Gui) {
 	if mut app is App {
 		app.build_selected_type = .not
+	}
+}
+
+fn diode_select(mut app ggui.Gui) {
+	if mut app is App {
+		app.build_selected_type = .diode
+	}
+}
+
+fn junction_select(mut app ggui.Gui) {
+	if mut app is App {
+		app.build_selected_type = .junction
 	}
 }
 
@@ -188,8 +192,15 @@ fn on_frame(mut app App) {
 	app.draw_elements()
 	app.draw_image()
 	app.undraw_elements()
-	app.preview()
+	if !(app.screen_mouse_x < 100 && app.screen_mouse_y < 410) {
+		app.preview()
+	}
 	app.gui.render()
+	app.gg.draw_rounded_rect_filled(bt_offset, bt_offset + space * int(app.build_selected_type), bt_scale, bt_scale, 10, gg.Color{80, 80, 80, 150})
+	app.gg.draw_image(bt_offset, bt_offset, bt_scale, bt_scale, app.ui_not)
+	app.gg.draw_image(bt_offset, bt_offset + space * 1, bt_scale, bt_scale, app.ui_diode)
+	app.gg.draw_image(bt_offset, bt_offset + space * 2, bt_scale, bt_scale, app.ui_wire)
+	app.gg.draw_image(bt_offset, bt_offset + space * 3, bt_scale, bt_scale, app.ui_junction)
 	app.gg.show_fps()
 	app.gg.end()
 }
@@ -204,6 +215,12 @@ fn on_event(e &gg.Event, mut app App) {
 			orientation_before := app.build_orientation
 			type_before := app.build_selected_type
 			match e.key_code {
+				/* gg doesn't detect numbers on top of keyboard
+				._1 {app.build_selected_type = .not}
+				._2 {app.build_selected_type = .diode}
+				._3 {app.build_selected_type = .wire}
+				._4 {app.build_selected_type = .junction}
+				*/
 				.escape {
 					app.gg.quit()
 				}
@@ -221,12 +238,13 @@ fn on_event(e &gg.Event, mut app App) {
 				}
 				.enter {
 					match app.build_selected_type {
-						.not { app.build_selected_type = .wire }
+						.not { app.build_selected_type = .diode }
+						.diode { app.build_selected_type = .wire }
 						.wire { app.build_selected_type = .junction }
 						.junction { app.build_selected_type = .not }
-						else { app.build_selected_type = .not }
 					}
 				}
+				/*
 				.w {
 					app.viewport_y += 5
 				}
@@ -239,6 +257,7 @@ fn on_event(e &gg.Event, mut app App) {
 				.d {
 					app.viewport_x -= 5
 				}
+				*/
 				.semicolon {
 					old := app.scale
 					if app.scale > 0.021 {
@@ -253,12 +272,12 @@ fn on_event(e &gg.Event, mut app App) {
 					app.viewport_x = int(f64(app.viewport_x) * (app.scale / old) )
 					app.viewport_y = int(f64(app.viewport_y) * (app.scale / old) )
 				}
-				.q{
+				.space{
 					app.place_is_turn	= 	!app.place_is_turn
 				}
 				.t {
 					if app.debug_mode {
-						app.test()
+						app.test(6)
 					}
 				}
 				else {}
@@ -270,7 +289,7 @@ fn on_event(e &gg.Event, mut app App) {
 			}
 		}
 		.mouse_up {
-			if !(e.mouse_x < 160 && e.mouse_y < 30) {
+			if !(e.mouse_x < 100 && e.mouse_y < 410) {
 				place_pos_x := app.mouse_x - (app.viewport_x + app.screen_x/2) / ceil(tile_size * app.scale) 
 				place_pos_y := app.mouse_y - (app.viewport_y + app.screen_y/2) / ceil(tile_size * app.scale)
 				app.is_placing = false

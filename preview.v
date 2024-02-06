@@ -76,9 +76,9 @@ fn (mut app App) preview_line(start_x int, start_y int, end_x int, end_y int) ! 
 	}else{
 		for i in 0 .. y {
 			if direction_y == 1 {
-				app.build_orientation = .east
+				app.build_orientation = .south
 			} else if direction_y == -1 {
-				app.build_orientation = .west
+				app.build_orientation = .north
 			}
 			app.tile_preview(start_x , start_y + i * direction_y)
 		}
@@ -90,9 +90,9 @@ fn (mut app App) preview_line(start_x int, start_y int, end_x int, end_y int) ! 
 
 		for i in 1 .. x + 1 {
 			if direction_x == 1 {
-				app.build_orientation = .south
+				app.build_orientation = .east
 			} else if direction_x == -1 {
-				app.build_orientation = .north
+				app.build_orientation = .west
 			}
 			app.tile_preview(start_x + i * direction_x, end_y)
 		}
@@ -120,9 +120,19 @@ fn (app App) tile_preview(x int, y int){
 			app.gg.draw_square_filled(preview_x, preview_y, ceil(tile_size * app.scale), color)
 		}
 		.junction {
-			color := gg.Color{255, 0, 255, 100}
+			color := gg.Color{100, 100, 100, 100}
 			app.gg.draw_square_filled(preview_x, preview_y, ceil(tile_size * app.scale), color)
 		}
-		else {}
+		.diode {
+			color := gg.Color{50, 100, 100, 100}
+			app.gg.draw_square_filled(preview_x, preview_y, ceil(tile_size * app.scale), gg.Color{100, 100, 100, 100})
+			rotation := match app.build_orientation {
+				.north { -90 }
+				.south { 90 }
+				.east { 0 }
+				.west { 180 }
+			}
+			app.gg.draw_polygon_filled(preview_x + half_scaled_tile_size, preview_y + half_scaled_tile_size, half_scaled_tile_size, 3, rotation, color)
+		}
 	}
 }
