@@ -15,6 +15,16 @@ fn (mut app App) preview_line(start_x int, start_y int, end_x int, end_y int) ! 
 	mut y := end_y - start_y
 	mut direction_x := 0
 	mut direction_y := 0
+	dump(end_x)
+	dump(start_x)
+
+
+	scaled_tile_size := ceil(tile_size * app.scale)
+	start_scaled_elem_x := start_x * scaled_tile_size
+	start_scaled_elem_y := start_y * scaled_tile_size
+	start_place_x := start_scaled_elem_x + scaled_tile_size - 1 + app.viewport_x + app.screen_x/2
+	start_place_y := start_scaled_elem_y + scaled_tile_size - 1 + app.viewport_y + app.screen_y/2
+
 	if x < 0 {
 		x = math.abs(x)
 		direction_x = -1
@@ -36,7 +46,7 @@ fn (mut app App) preview_line(start_x int, start_y int, end_x int, end_y int) ! 
 				} else if direction_x == -1 {
 					app.build_orientation = .west
 				}
-				app.tile_preview(start_x + i * direction_x, start_y)
+				app.tile_preview(start_place_x + i * direction_x, start_place_y)
 			}
 		} else {
 			for i in 0 .. y + 1 {
@@ -45,7 +55,7 @@ fn (mut app App) preview_line(start_x int, start_y int, end_x int, end_y int) ! 
 				} else if direction_y == -1 {
 					app.build_orientation = .north
 				}
-				app.tile_preview(start_x, start_y + i * direction_y)
+				app.tile_preview(start_place_x, start_place_y + i * direction_y)
 			}
 		}
 	}else if x > y{
@@ -55,12 +65,12 @@ fn (mut app App) preview_line(start_x int, start_y int, end_x int, end_y int) ! 
 			} else if direction_x == -1 {
 				app.build_orientation = .west
 			}
-			app.tile_preview(start_x + i * direction_x, start_y)
+			app.tile_preview(start_place_x + i * direction_x, start_place_y)
 		}
 		if y > 0 {
 			tempo := app.build_selected_type
 			app.build_selected_type = .wire
-			app.tile_preview(end_x, start_y)
+			app.tile_preview(end_x, start_place_y)
 			app.build_selected_type = tempo
 
 			for i in 1 .. y + 1 {
@@ -69,7 +79,7 @@ fn (mut app App) preview_line(start_x int, start_y int, end_x int, end_y int) ! 
 				} else if direction_y == -1 {
 					app.build_orientation = .north
 				}
-				app.tile_preview(end_x, start_y + i * direction_y)
+				app.tile_preview(end_x, start_place_y + i * direction_y)
 			}
 		}else{app.tile_preview(end_x, end_y)}
 		
@@ -80,12 +90,12 @@ fn (mut app App) preview_line(start_x int, start_y int, end_x int, end_y int) ! 
 			} else if direction_y == -1 {
 				app.build_orientation = .north
 			}
-			app.tile_preview(start_x , start_y + i * direction_y)
+			app.tile_preview(start_place_x , start_place_y + i * direction_y)
 		}
 
 		tempo := app.build_selected_type
 		app.build_selected_type = .wire
-		app.tile_preview(start_x, end_y)
+		app.tile_preview(start_place_x, end_y)
 		app.build_selected_type = tempo
 
 		for i in 1 .. x + 1 {
@@ -94,7 +104,7 @@ fn (mut app App) preview_line(start_x int, start_y int, end_x int, end_y int) ! 
 			} else if direction_x == -1 {
 				app.build_orientation = .west
 			}
-			app.tile_preview(start_x + i * direction_x, end_y)
+			app.tile_preview(start_place_x + i * direction_x, end_y)
 		}
 	}
 }
